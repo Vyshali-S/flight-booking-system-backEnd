@@ -106,6 +106,21 @@ catch(ex){
 }
 })
 
+routes.delete("/:id",async(req,res)=>{
+try{
+    let flight = await Flights.findById(req.params.id);
+    if(!flight) return res.status(404).send({"message":"Flight Not Found / invalid flight id"});
+
+    await Flights.findOneAndDelete({_id:req.params.id})
+    res.send({"message":"Deleted Sucessfully"})
+    
+}
+catch (ex){
+    res.status(400).send(_.pick(ex,["message"]))
+}
+})
+
+
 
 const createFlight = (name,number,pricePerSeat,seats)=>{
     let flight = new Flights({
