@@ -4,14 +4,16 @@ const routes = express.Router();
 const _ = require("lodash")
 const {allotmentSchema}= require("../model/Allotment")
 const {flightJoiSchema,flightSchema}= require("../model/Flight")
+const {userSchema} = require("../model/User")
 
 const Flights = mongoose.model("flights",flightSchema)
-const Allotment = mongoose.model("allotments",allotmentSchema)
+const Allotments = mongoose.model("allotments",allotmentSchema)
+const Users = mongoose.model("users",userSchema)
 
 routes.get("/",async(req,res)=>{
 try{
     let listFlights = await Flights.find()
-    .populate("allotmentId")
+    .populate("allotmentId bookedUsers")
     ;
     res.send(listFlights)
 }
@@ -40,7 +42,7 @@ try{
     let flight = await Flights.findById(req.params.id);
     if(!flight) return res.status(404).send({"message":"Flight Not Found / invalid flight id"});
 
-    let allotment = await Allotment.findById(req.body.allotmentId)
+    let allotment = await Allotments.findById(req.body.allotmentId)
     if(!allotment) return res.status(404).send({"message":"Invalid Allotment Id / Allotment Not found"});
 
     flight.allotmentId = req.body.allotmentId;
@@ -48,6 +50,25 @@ try{
     res.send(result)
 }
 catch (ex){
+    res.status(400).send(_.pick(ex,["message"]))
+}
+})
+
+routes.put("/setUser/:id",async(req,res)=>{
+try{
+    const user = await Users.findById(req.body.userId)
+    if(!user) return res.status(404).send({"message":"User not found / Invalid user Id"});
+
+    let flight = await Flights.findById(req.params.id);
+    if(!flight) return res.status(404).send({"message":"Flight Not Found / invalid flight id"});
+
+    if(flight.bookedUsers.includes(req.body.userId)) return res.send(flight);
+    flight.bookedUsers.push(user)
+    let result = await flight.save()
+    
+    res.send(result)
+}
+catch(ex){
     res.status(400).send(_.pick(ex,["message"]))
 }
 })

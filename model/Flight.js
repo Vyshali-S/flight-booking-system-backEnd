@@ -34,6 +34,7 @@ const flightSchema = mongoose.Schema({
     },
     number:{
         type:Number,
+        unique:true,
         required:true
     },
     seats:{
@@ -51,7 +52,7 @@ const flightSchema = mongoose.Schema({
   },
     bookedUsers : {
         type: [
-            {userId : {type:mongoose.Schema.Types.ObjectId,ref:"users"} }
+            {type:mongoose.Schema.Types.ObjectId,ref:"users"} 
         ]
     },
     allotmentId : {

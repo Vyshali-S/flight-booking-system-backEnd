@@ -22,8 +22,8 @@ const allotmentSchema = mongoose.Schema({
     }, 
     flights :{
         type:[
-            {flightId : {type:mongoose.Schema.Types.ObjectId,ref:"flights"}
-        }
+             {type:mongoose.Schema.Types.ObjectId,ref:"flights"}
+        
         ]
     }
 })
@@ -38,8 +38,8 @@ const allotmentJoiSchema = Joi.object({
     .max(20)
     .required(),
     departureDateAndTime : Joi.date()
-    .required(),
-    flights : Joi.object()
+    .required(), 
+    flightId : Joi.string()
 
 })
 
