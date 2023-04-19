@@ -22,7 +22,7 @@ const flightJoiSchema = Joi.object({
     .min(0)
     .required(),
     bookedUsers : Joi.object(),
-    allotment : Joi.object()
+    allotmentId : Joi.object()
 }) 
 
 const flightSchema = mongoose.Schema({
@@ -54,7 +54,7 @@ const flightSchema = mongoose.Schema({
             {userId : {type:mongoose.Schema.Types.ObjectId,ref:"users"} }
         ]
     },
-    allotment : {
+    allotmentId : {
         type: mongoose.Schema.Types.ObjectId,
         ref:"allotments"
     },
