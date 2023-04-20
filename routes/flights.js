@@ -4,6 +4,7 @@ const routes = express.Router();
 const _ = require("lodash") 
 const {flightJoiSchema,flightSchema}= require("../model/Flight")
 const {userSchema} = require("../model/User")
+const authAdminMin = require("../middleware/authAdminMid")
 
 const Flights = mongoose.model("flights",flightSchema) 
 const Users = mongoose.model("users",userSchema)
@@ -45,7 +46,7 @@ routes.get("/?",async(req,res)=>{
 })
 
 
-routes.post("/",async(req,res)=>{
+routes.post("/",authAdminMin,async(req,res)=>{
 try{ 
     const {error} = flightJoiSchema.validate(req.body) 
     if(error) return res.status(400).send(_.pick(error,["message"]))
@@ -59,7 +60,7 @@ catch(ex){
 }
 })
 
-routes.put("/:id",async(req,res)=>{
+routes.put("/:id",authAdminMin,async(req,res)=>{
 try{
     let flight = await Flights.findById(req.params.id);
     if(!flight) return res.status(404).send({"message":"Flight Not Found / invalid flight id"});

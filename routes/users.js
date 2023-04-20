@@ -1,9 +1,12 @@
 const express = require("express");
 const _ = require("lodash")
+const bcrypt  = require("bcrypt")
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken")
 const {createUserJoiSchema,userSchema,userTickectJoiSchema,bookingFlightSchema} = require("../model/User");
 const {flightSchema} = require("../model/Flight")
 const Joi = require("joi");
+const authUserMid = require("../middleware/authUserMid");
 const routes = express.Router();
  
 const Users = mongoose.model("users",userSchema)
@@ -26,24 +29,33 @@ try{
 catch(ex){
     res.status(400).send(_.pick(ex,["message"]))
 }
-})
+}) 
 
 routes.post("/",async(req,res)=>{
 try{
     const {error} = createUserJoiSchema.validate(req.body)
     if(error) return res.status(400).send(_.pick(error,["message"]));
 
-    let user = createUser(req.body.name,req.body.email,req.body.phone,req.body.password)
+    let isUserEmailExits = await Users.findOne({email:req.body.email});
+    if(isUserEmailExits) return res.status(400).send({"message":"Mail id Already Exists"})
 
+    let user = createUser(req.body.name,req.body.email,req.body.phone,req.body.password)
+    
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password,salt)
     user = await user.save()
-    res.send(_.pick(user,["_id","name","email","phone"]))
+
+    const token = jwt.sign({_id:user._id},"flightBooking")
+    // res.send(_.pick(user,["_id","name","email","phone"]))
+
+    res.header("x-auth-user-token",token).send({user : _.pick(user,["name","email","_id","tickets","phone"]),token:token})
 }
 catch(ex){
     res.status(400).send(_.pick(ex,["message"]))
 }
 })
 
-routes.put("/bookTicket/:id",async(req,res)=>{
+routes.put("/bookTicket/:id",authUserMid,async(req,res)=>{
 try{
     let user = await Users.findById(req.params.id);
     if(!user) return res.status(404).send({"message":"Invalid User ID"});
