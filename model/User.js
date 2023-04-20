@@ -15,6 +15,16 @@ const userTickectJoiSchema = Joi.object({
                 seatId: Joi.string().min(1).required()
             })
 })
+const bookingFlightSchema = Joi.object({
+    flightId : Joi.string().required(),
+    seats : 
+    Joi.array()
+    .items({
+        seatId : Joi.string().required()
+    })
+    .min(1)
+    .required()
+})
 
 const userSchema = mongoose.Schema({
     name : {
@@ -46,3 +56,4 @@ const userSchema = mongoose.Schema({
 module.exports.createUserJoiSchema = createUserJoiSchema;
 module.exports.userTickectJoiSchema = userTickectJoiSchema;
 module.exports.userSchema = userSchema;
+module.exports.bookingFlightSchema = bookingFlightSchema
