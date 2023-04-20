@@ -3,6 +3,16 @@ const Joi = require("joi");
 Joi.objectId = require('joi-objectid')(Joi)
  
 const flightJoiSchema = Joi.object({
+    from : Joi.string()
+    .min(3)
+    .max(20)
+    .required(),
+    to : Joi.string()
+    .min(3)
+    .max(20)
+    .required(),
+    departureDateAndTime : Joi.date()
+    .required(), 
     name: Joi.string()
     .min(3)
     .max(20)
@@ -22,10 +32,26 @@ const flightJoiSchema = Joi.object({
     .min(0)
     .required(),
     bookedUsers : Joi.object(),
-    allotmentId : Joi.object()
 }) 
 
 const flightSchema = mongoose.Schema({
+
+    from : {
+        type:String,
+        minLength:3,
+        maxLength:10,
+        required:true
+    },
+    to :{
+        type:String,
+        minLength:3,
+        maxLength:20,
+        required:true
+    },
+    departureDateAndTime:{
+        type:Date,
+        required:true
+    },
     name:{
         type:String,
         minLength:3,
@@ -54,11 +80,7 @@ const flightSchema = mongoose.Schema({
         type: [
             {type:mongoose.Schema.Types.ObjectId,ref:"users"} 
         ]
-    },
-    allotmentId : {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"allotments"
-    },
+    } 
 
 })
 

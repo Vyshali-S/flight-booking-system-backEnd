@@ -1,8 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose")
 const app = express();
-const userRoute = require("./routes/users")
-const allotmentRoutes = require("./routes/allotments") 
+const userRoute = require("./routes/users") 
 const flightsRoutes = require("./routes/flights")
 
 mongoose.connect("mongodb://0.0.0.0:27017/FlightBookingSystem")
@@ -14,8 +13,7 @@ app.use(express.json());
 app.get("/",(req,res)=>{
     res.send("Hey Working file")
 })
-app.use("/users",userRoute)
-app.use("/allotments",allotmentRoutes)
+app.use("/users",userRoute) 
 app.use("/flights",flightsRoutes)
 
 const port = process.env.PORT || 3000;

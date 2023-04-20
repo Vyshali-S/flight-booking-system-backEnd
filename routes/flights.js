@@ -1,19 +1,17 @@
 const mongoose = require("mongoose")
 const express = require("express");
 const routes = express.Router();
-const _ = require("lodash")
-const {allotmentSchema}= require("../model/Allotment")
+const _ = require("lodash") 
 const {flightJoiSchema,flightSchema}= require("../model/Flight")
 const {userSchema} = require("../model/User")
 
-const Flights = mongoose.model("flights",flightSchema)
-const Allotments = mongoose.model("allotments",allotmentSchema)
+const Flights = mongoose.model("flights",flightSchema) 
 const Users = mongoose.model("users",userSchema)
 
-routes.get("/",async(req,res)=>{
+routes.get("/allFlights",async(req,res)=>{
 try{
     let listFlights = await Flights.find()
-    .populate("allotmentId bookedUsers")
+    .populate("bookedUsers")
     ;
     res.send(listFlights)
 }
@@ -25,7 +23,7 @@ catch (ex){
 routes.get("/:id", async(req,res)=>{
 try{
     let flight = await Flights.find({_id:req.params.id})
-    .populate("allotmentId bookedUsers")
+    .populate("bookedUsers")
     if(flight.length<1) return res.send({message:"Invalid Flight ID"})
     res.send(flight)
 }
@@ -34,13 +32,24 @@ catch(ex){
 }
 } )
 
+
+routes.get("/?",async(req,res)=>{
+    if(!req.query.from || !req.query.to || !req.query.departureDateAndTime){
+        return res.status(400).send({message:"enter a valid query"})
+    }
+
+    const flights = await Flights.find({from:req.query.from ,to:req.query.to,departureDateAndTime: {"$gte": new Date(req.query.departureDateAndTime)}})
+    .populate("bookedUsers")
+    res.send(flights)
+})
+
+
 routes.post("/",async(req,res)=>{
-try{
-    // req.body.seats = JSON.parse(req.body.seats)
+try{ 
     const {error} = flightJoiSchema.validate(req.body) 
     if(error) return res.status(400).send(_.pick(error,["message"]))
 
-    let fligt = createFlight(req.body.name,req.body.number,req.body.pricePerSeat,req.body.seats)
+    let fligt = createFlight(req.body.from,req.body.to,req.body.departureDateAndTime,req.body.name,req.body.number,req.body.pricePerSeat,req.body.seats)
     fligt = await fligt.save();
     res.send(fligt)
 }
@@ -56,7 +65,9 @@ try{
     
     const {error} = flightJoiSchema.validate(req.body) 
     if(error) return res.status(400).send(_.pick(error,["message"]));
- 
+    flight.from = req.body.from;
+    flight.to = req.body.to;
+    flight.departureDateAndTime = req.body.departureDateAndTime;
     flight.name = req.body.name;
     flight.number = req.body.number;
     flight.pricePerSeat = req.body.pricePerSeat;
@@ -68,24 +79,7 @@ try{
 catch(ex){
     res.status(400).send(_.pick(ex,["message"]))
 }
-})
-
-routes.put("/setAllotment/:id",async(req,res)=>{
-try{
-    let flight = await Flights.findById(req.params.id);
-    if(!flight) return res.status(404).send({"message":"Flight Not Found / invalid flight id"});
-
-    let allotment = await Allotments.findById(req.body.allotmentId)
-    if(!allotment) return res.status(404).send({"message":"Invalid Allotment Id / Allotment Not found"});
-
-    flight.allotmentId = req.body.allotmentId;
-    let result = await flight.save();
-    res.send(result)
-}
-catch (ex){
-    res.status(400).send(_.pick(ex,["message"]))
-}
-})
+}) 
 
 routes.put("/setUser/:id",async(req,res)=>{
 try{
@@ -122,8 +116,11 @@ catch (ex){
 
 
 
-const createFlight = (name,number,pricePerSeat,seats)=>{
+const createFlight = (from,to,departureDateAndTime,name,number,pricePerSeat,seats)=>{
     let flight = new Flights({
+        from:from,
+        to:to,
+        departureDateAndTime:departureDateAndTime,
         name:name,
         number:number,
         pricePerSeat:pricePerSeat,
