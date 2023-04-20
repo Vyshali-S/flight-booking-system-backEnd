@@ -83,25 +83,6 @@ catch(ex){
 }
 }) 
 
-routes.put("/setUser/:id",async(req,res)=>{
-try{
-    const user = await Users.findById(req.body.userId)
-    if(!user) return res.status(404).send({"message":"User not found / Invalid user Id"});
-
-    let flight = await Flights.findById(req.params.id);
-    if(!flight) return res.status(404).send({"message":"Flight Not Found / invalid flight id"});
-
-    if(flight.bookedUsers.includes(req.body.userId)) return res.send(flight);
-    flight.bookedUsers.push(user)
-    let result = await flight.save()
-
-    res.send(result)
-}
-catch(ex){
-    res.status(400).send(_.pick(ex,["message"]))
-}
-})
-
 routes.delete("/:id",async(req,res)=>{
 try{
     let flight = await Flights.findById(req.params.id);
