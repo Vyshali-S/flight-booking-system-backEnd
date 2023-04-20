@@ -16,7 +16,7 @@ const flightJoiSchema = Joi.object({
         .required(),
         isAvailable :  Joi.boolean()
         .required()
-    })
+    }).min(60)
     .required(),
     pricePerSeat : Joi.number()
     .min(0)
