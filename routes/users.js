@@ -7,13 +7,14 @@ const {createUserJoiSchema,userSchema,userTickectJoiSchema,bookingFlightSchema} 
 const {flightSchema} = require("../model/Flight")
 const Joi = require("joi");
 const authUserMid = require("../middleware/authUserMid");
+const authAdminMid = require("../middleware/authAdminMid");
 const routes = express.Router();
  
 const Users = mongoose.model("users",userSchema)
 const Flight = mongoose.model("flights",flightSchema)
 
 
-routes.get("/",async(req,res)=>{
+routes.get("/",authAdminMid,async(req,res)=>{
     let listAllUser = await Users.find().populate("tickets.flightId");
     res.send(listAllUser)
 

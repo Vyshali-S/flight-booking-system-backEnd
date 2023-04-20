@@ -9,7 +9,7 @@ function generateSeat(start,end,noOfRows){
             seats.push(eachSeat)
         }
     }
-    return(seats)
+    return(JSON.stringify( seats))
 }
 console.log(generateSeat("a","f",10))
 

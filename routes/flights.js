@@ -22,6 +22,17 @@ catch (ex){
 }
 })
 
+routes.get("/bookedFlights",async(req,res)=>{
+try{
+    const flights = await Flights.find({ "bookedUsers" :  { "$size": 1  } })
+    res.send(flights)
+}
+catch(ex){
+    res.status(400).send(_.pick(ex,["message"]))
+}
+
+})
+
 routes.get("/:id", async(req,res)=>{
 try{
     let flight = await Flights.find({_id:req.params.id})
@@ -37,7 +48,7 @@ catch(ex){
 
 routes.get("/?",async(req,res)=>{
     if(!req.query.from || !req.query.to || !req.query.departureDateAndTime){
-        return res.status(400).send({message:"enter a valid query"})
+        return res.status(400).send({message:"enter a valid query, formate /?`from=cityName&to=cityName&departureDateAndTime=year-month-day"})
     }
     
     const flights = await Flights.find({from:req.query.from ,to:req.query.to,departureDateAndTime: {"$gte": new Date(req.query.departureDateAndTime)}})
@@ -83,7 +94,7 @@ catch(ex){
 }
 }) 
 
-routes.delete("/:id",async(req,res)=>{
+routes.delete("/:id",authAdminMin,async(req,res)=>{
 try{
     let flight = await Flights.findById(req.params.id);
     if(!flight) return res.status(404).send({"message":"Flight Not Found / invalid flight id"});
