@@ -12,6 +12,7 @@ routes.get("/allFlights",async(req,res)=>{
 try{
     let listFlights = await Flights.find()
     .populate("bookedUsers")
+    .sort({departureDateAndTime: 1})
     ;
     res.send(listFlights)
 }
@@ -37,7 +38,7 @@ routes.get("/?",async(req,res)=>{
     if(!req.query.from || !req.query.to || !req.query.departureDateAndTime){
         return res.status(400).send({message:"enter a valid query"})
     }
-
+    
     const flights = await Flights.find({from:req.query.from ,to:req.query.to,departureDateAndTime: {"$gte": new Date(req.query.departureDateAndTime)}})
     .populate("bookedUsers")
     res.send(flights)

@@ -10,14 +10,10 @@ const createUserJoiSchema = Joi.object({
     password:  Joi.string().min(3).max(15).required()
 })
 const userTickectJoiSchema = Joi.object({
-    tickets : Joi.array().items(
-        {
             flightId: Joi.objectId().required(),
             seats : Joi.array().items({
-                seatId: Joi.string()
+                seatId: Joi.string().min(1).required()
             })
-        }
-    )
 })
 
 const userSchema = mongoose.Schema({
