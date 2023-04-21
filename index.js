@@ -25,7 +25,7 @@ app.use("/users",userRoute)
 app.use("/flights",flightsRoutes)
 app.use("/admins",adminRoutes)
 app.use("/authUser",authUser)
-app.use("/authAdmins",authAdmin)
+app.use("/authAdmin",authAdmin)
 
 
 const port = process.env.PORT || 3000;

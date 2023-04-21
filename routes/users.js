@@ -96,7 +96,7 @@ try{
     user.tickets.push({flightId:req.body.flightId,seats:req.body.seats})
     user.save()
 
-    user = await Users.find({_id:req.params.id}).populate("tickets.flightId")
+    user = await Users.find({_id:req.params.id}).populate("tickets.flightId").select("-password")
     res.send(user)
 
 

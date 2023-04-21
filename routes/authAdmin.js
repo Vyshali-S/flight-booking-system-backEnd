@@ -20,10 +20,10 @@ routes.post("/",async(req,res)=>{
     if(error) return res.status(400).send(_.pick(error,["message"]))
 
     let admin = await Admin.findOne({ email: req.body.email });
-    if (!admin) return res.status(400).send('Invalid email or password.');
+    if (!admin) return res.status(400).send({"message":'Invalid email or password.'});
 
     const validPassword = await bcrypt.compare(req.body.password, admin.password);
-    if (!validPassword) return res.status(400).send('Invalid email or password.');
+    if (!validPassword) return res.status(400).send({"message":'Invalid email or password.'});
  
     const token = jwt.sign({_id:admin._id},"flightBooking")
 
