@@ -37,7 +37,7 @@ routes.get("/:id", async(req,res)=>{
 try{
     let flight = await Flights.find({_id:req.params.id})
     .populate("bookedUsers")
-    if(flight.length<1) return res.send({message:"Invalid Flight ID"})
+    if(flight.length<1) return res.status(400).send({message:"Invalid Flight ID"})
     res.send(flight)
 }
 catch(ex){
